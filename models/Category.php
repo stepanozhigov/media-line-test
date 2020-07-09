@@ -43,11 +43,14 @@ class Category extends \yii\db\ActiveRecord
                 'attribute' => 'title',
                 'slugAttribute' => 'slug',
             ],
+//            [
+//                'class'=>Multili
+//            ],
             [
                 'class' => BlameableBehavior::class,
                 'createdByAttribute' => 'user_id',
-            ],
-            TimestampBehavior::class
+                'updatedByAttribute'=> false
+            ]
         ];
 
     }

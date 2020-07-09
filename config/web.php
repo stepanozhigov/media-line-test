@@ -4,9 +4,11 @@ $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
 $config = [
-    'id' => 'basic',
+    'id' => 'media-line-test',
+    'name'=>'Новостной Каталог',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+    'defaultRoute'=>'article/',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
@@ -48,6 +50,8 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'article/<action:(index|create|update|delete)>'=>'article/<action>',
+                'article/<slug>'=>'article/view'
             ],
         ]
 

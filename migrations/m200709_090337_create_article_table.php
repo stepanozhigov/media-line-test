@@ -3,33 +3,32 @@
 use yii\db\Migration;
 
 /**
- * Handles the creation of table 'category'.
+ * Handles the creation of table `{{%article}}`.
  */
-class m200708_150452_create_categories_table extends Migration
+class m200709_090337_create_article_table extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable('category', [
+        $this->createTable('article', [
             'id' => $this->primaryKey(),
             'title'=>$this->string()->notNull()->unique(),
-            'slug' => $this->string()->notNull()->unique(),
+            'slug'=>$this->string()->notNull()->unique(),
+            'body'=>$this->text(),
             'user_id'=>$this->integer(),
-            'parent_id'=>$this->integer(),
-            'description'=>$this->text(),
+            'created_at'=>$this->integer(),
             'updated_at'=>$this->integer(),
-            'created_at'=>$this->integer()
         ]);
         $this->createIndex(
-            'idx-category-user_id',
-            'category',
+            'idx-article-user_id',
+            'article',
             'user_id'
         );
         $this->addForeignKey(
-            'fk-category-user_id',
-            'category',
+            'fk-article-user_id',
+            'article',
             'user_id',
             'user',
             'id',
@@ -42,6 +41,6 @@ class m200708_150452_create_categories_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropTable('category');
+        $this->dropTable('article');
     }
 }

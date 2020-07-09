@@ -1,11 +1,11 @@
 <?php
 
 /* @var $this yii\web\View */
-/* @var $form yii\bootstrap\ActiveForm */
+/* @var $form yii\bootstrap4\ActiveForm */
 /* @var $model app\models\SignupForm */
 
 use yii\helpers\Html;
-use yii\bootstrap\ActiveForm;
+use yii\bootstrap4\ActiveForm;
 
 $this->title = 'Signup';
 $this->params['breadcrumbs'][] = $this->title;
@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>Please fill out the following fields to login:</p>
 
-    <?php $form = ActiveForm::begin([
+    <?php $form = \yii\bootstrap4\ActiveForm::begin([
         'id' => 'login-form',
         'layout' => 'horizontal',
         'fieldConfig' => [
