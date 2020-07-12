@@ -6,6 +6,7 @@ use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
+use yii\helpers\Html;
 
 /**
  * This is the model class for table "category".
@@ -20,6 +21,7 @@ use yii\behaviors\TimestampBehavior;
  * @property string|null $created_at
  *
  * @property User $user
+ * @property Category $parent
  */
 class Category extends \yii\db\ActiveRecord
 {
@@ -38,13 +40,22 @@ class Category extends \yii\db\ActiveRecord
     {
         return [
             TimestampBehavior::class,
-            [
-                'class' => SluggableBehavior::class,
-                'attribute' => 'title',
+            'slug' => [
+                'class' => 'Zelenin\yii\behaviors\Slug',
                 'slugAttribute' => 'slug',
+                'attribute' => 'title',
+                // optional params
+                'ensureUnique' => true,
+                'replacement' => '-',
+                'lowercase' => true,
+                'immutable' => false,
+                // If intl extension is enabled, see http://userguide.icu-project.org/transforms/general.
+                'transliterateOptions' => 'Russian-Latin/BGN; Any-Latin; Latin-ASCII; NFD; [:Nonspacing Mark:] Remove; NFC;'
             ],
 //            [
-//                'class'=>Multili
+//                'class' => SluggableBehavior::class,
+//                'attribute' => 'title',
+//                'slugAttribute' => 'slug',
 //            ],
             [
                 'class' => BlameableBehavior::class,
@@ -62,7 +73,7 @@ class Category extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'slug', 'user_id'], 'required'],
+            [['title'], 'required'],
             [['user_id', 'parent_id'], 'integer'],
             [['description'], 'string'],
             [['updated_at', 'created_at'], 'safe'],
@@ -80,13 +91,13 @@ class Category extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'title' => 'Title',
-            'slug' => 'Slug',
-            'user_id' => 'User ID',
-            'parent_id' => 'Parent ID',
-            'description' => 'Description',
-            'updated_at' => 'Updated At',
-            'created_at' => 'Created At',
+            'title' => 'Заголовок',
+            'slug' => 'Идентификатор',
+            'user_id' => 'Пользователь ID',
+            'parent_id' => 'Головная Рубрика',
+            'description' => 'Описание',
+            'updated_at' => 'Обновлено',
+            'created_at' => 'Создано',
         ];
     }
 
@@ -97,16 +108,22 @@ class Category extends \yii\db\ActiveRecord
     public static function getAllCategories($parent = 0, $level = 0, $exclude = 0) {
         $children = self::find()
             ->where(['parent_id' => $parent])
+            ->with('articles')
             ->asArray()
+            ->orderBy('title ASC')
             ->all();
         $result = [];
         foreach ($children as $category) {
             if ($category['id'] == $exclude) {
                 continue;
             }
+            $category['level'] = $level;
             if ($level) {
-                $category['name'] = str_repeat('— ', $level) . $category['name'];
+                $category['name'] = str_repeat('— ', $level) . $category['title'];
+            } else {
+                $category['name'] = $category['title'];
             }
+            $category['articles_count'] = count($category['articles']);
             $result[] = $category;
             $result = array_merge(
                 $result,
@@ -124,12 +141,63 @@ class Category extends \yii\db\ActiveRecord
         $data = self::getAllCategories(0, 0, $exclude);
         $tree = [];
         if ($root) {
-            $tree[0] = 'No Parent';
+            $tree[0] = 'Корневая Рубрика';
         }
         foreach ($data as $item) {
             $tree[$item['id']] = $item['name'];
         }
         return $tree;
+    }
+
+    //
+    public static function getTreeCategories(array &$tree, $parent_id = 0) {
+    $branch = array();
+
+    foreach ($tree as $element) {
+        if ($element['parent_id'] == $parent_id) {
+            $children = self::getTreeCategories($tree, $element['id']);
+            if ($children) {
+                $element['children'] = $children;
+            }
+            $branch[] = $element;
+        }
+    }
+
+    return $branch;
+}
+    //
+    public static function printTreeCategories($tree, $parent_id = 0) {
+        $output = "<ul>";
+        foreach ($tree as $element) {
+            $output .= "<li><a href='#'>".$element['title']."</a></li>";
+            if ($element['parent_id'] == $parent_id) {
+                $children = self::getTreeCategories($tree, $element['id']);
+                if ($children) {
+                    $output .= "<li><ul>";
+                    foreach ($children as $child) {
+                        $output .= "<li>".$child['title']."</li>";
+                    }
+                    $output .= "</ul></li>";
+                    $element['children'] = $children;
+                }
+                $branch[] = $element;
+            }
+        }
+        $output .= "</ul>";
+        return $output;
+    }
+
+    public static function getParentCategories($parent_id) {
+        $result = [];
+        $parent = self::find()->where(['id'=>$parent_id])->orderBy('title ASC')->asArray()->one();
+        if($parent) {
+            $result[] = $parent;
+            $result = array_merge(
+                $result,
+                self::getParentCategories($parent['parent_id'])
+            );
+        }
+        return array_reverse($result);
     }
 
     /**
@@ -140,5 +208,30 @@ class Category extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
+    }
+
+    /**
+     * Gets query for [[Category]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getParent()
+    {
+        return $this->hasOne(Category::class, ['id' => 'parent_id']);
+    }
+
+    public function getChildren()
+    {
+        return $this->hasMany(Category::class, ['parent_id' => 'id']);
+        //return self::find()->where(['parent_id'=>'id'])->all();
+    }
+
+    public function getArticles() {
+        return $this->hasMany(Article::class,['id'=>'article_id'])
+            ->viaTable('article_category',['category_id'=>'id']);
+    }
+
+    public function getEncodedText($param) {
+        return Html::encode($this->$param);
     }
 }

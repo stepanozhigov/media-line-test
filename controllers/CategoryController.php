@@ -2,21 +2,19 @@
 
 namespace app\controllers;
 
-use app\models\Category;
-use Yii;
 use app\models\Article;
-use app\models\ArticleSearch;
+use Yii;
+use app\models\Category;
+use app\models\CategorySearch;
 use yii\data\ActiveDataProvider;
-use yii\filters\AccessControl;
 use yii\web\Controller;
-use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * ArticleController implements the CRUD actions for Article model.
+ * CategoryController implements the CRUD actions for Category model.
  */
-class ArticleController extends Controller
+class CategoryController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -24,19 +22,8 @@ class ArticleController extends Controller
     public function behaviors()
     {
         return [
-            [
-                'class'=>AccessControl::class,
-                'only'=>['create','update','delete'],
-                'rules'=>[
-                    [
-                        'actions'=>['create','update','delete'],
-                        'allow'=>true,
-                        'roles'=>['@']
-                    ]
-                ]
-            ],
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -45,70 +32,57 @@ class ArticleController extends Controller
     }
 
     /**
-     * Lists all Article models.
+     * Lists all Category models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new ArticleSearch();
-        //$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $dataProvider = new ActiveDataProvider([
-            'query' => Article::find(),
-            'pagination' => [
-                'pageSize' => 50,
-            ],
-        ]);
         return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+                'categories' => Category::getAllCategories(),
         ]);
     }
 
     /**
-     * Displays a single Article model.
-     * @param string $slug
+     * Displays a single Category model.
+     * @param integer $slug
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($slug)
     {
         return $this->render('view', [
-            'model' => $this->findModel($slug),
+            'model' => $this->findModel($slug)
         ]);
     }
 
     /**
-     * Creates a new Article model.
+     * Creates a new Category model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Article();
-
+        $model = new Category();
+        //echo '<pre>',print_r(Yii::$app->request->post(),1),'</pre>';
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'slug' => $model->slug]);
         }
-
         return $this->render('create', [
             'model' => $model,
-            'categories'=>Category::getAllCategories()
         ]);
     }
 
     /**
-     * Updates an existing Article model.
+     * Updates an existing Category model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param string $slug
+     * @param integer $slug
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionUpdate($slug)
     {
         $model = $this->findModel($slug);
-        if($model->user_id !== Yii::$app->user->id) {
-            throw new ForbiddenHttpException('You do not have permissions to update this article');
-        }
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'slug' => $model->slug]);
         }
@@ -119,41 +93,41 @@ class ArticleController extends Controller
     }
 
     /**
-     * Deletes an existing Article model.
+     * Deletes an existing Category model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
+     * @param integer $slug
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionDelete($slug)
     {
-        $model = $this->findModel($slug);
-        if($model->user_id !== Yii::$app->user->id) {
-            throw new ForbiddenHttpException('You do not have permissions to update this article');
-        }
-        $model->delete();
+        $this->findModel($slug)->delete();
 
         return $this->redirect(['index']);
     }
 
     /**
-     * Finds the Article model based on its primary key value.
+     * Finds the Category model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return Article the loaded model
+     * @param integer $slug
+     * @return Category the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($slug)
     {
-        if (($model = Article::findOne(['slug'=>$slug])) !== null) {
+        if (($model = Category::findOne(['slug'=>$slug])) !== null) {
             return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-//    public function actionCategory($slug) {
-//        $articles = Article::find()->all();
-//        $this->render('categoryList',['articles'=>$articles]);
-//    }
+    protected function findModelWithArticles($slug)
+    {
+        if (($model = Category::find()->where(['slug'=>$slug])->with('articles')->one()) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
 }

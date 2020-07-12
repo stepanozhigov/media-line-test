@@ -93,4 +93,9 @@ class Article extends \yii\db\ActiveRecord
     public function getEncodedText($param) {
         return Html::encode($this->$param);
     }
+
+    public function getCategories() {
+        return $this->hasMany(Category::class,['id'=>'category_id'])
+            ->viaTable('article_category',['article_id'=>'id']);
+    }
 }

@@ -23,6 +23,8 @@ class AppAsset extends AssetBundle
         'css/site.css',
     ];
     public $js = [
+        'https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.7/holder.min.js'
     ];
     public $depends = [
         'yii\web\YiiAsset',

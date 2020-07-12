@@ -8,7 +8,7 @@ $config = [
     'name'=>'Новостной Каталог',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
-    'defaultRoute'=>'article/',
+    'defaultRoute'=>'category/',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
@@ -50,8 +50,49 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                'article/<action:(index|create|update|delete)>'=>'article/<action>',
-                'article/<slug>'=>'article/view'
+                //article create
+                [
+                    'pattern' => 'news/<action:(create)>',
+                    'route' => 'article/<action>'
+                ],
+                //article edit update delete
+                [
+                    'pattern' => 'news/<action:(update|delete)>/<slug>',
+                    'route' => 'article/<action>'
+                ],
+                //article view
+                [
+                    'pattern' => 'news/<slug>',
+                    'route' => 'article/view'
+                ],
+                //article index
+                [
+                    'pattern' => 'news',
+                    'route' => 'article/index'
+                ],
+                //article view
+                'article/<slug>'=>'article/view',
+
+                //category index
+                [
+                    'pattern' => 'rubriki',
+                    'route' => 'category/index'
+                ],
+                //category update delete
+                [
+                    'pattern' => 'rubrika/<action:(update|delete)>/<slug>',
+                    'route' => 'category/<action>'
+                ],
+                //category create
+                [
+                    'pattern' => 'rubrika/<action:(create)>',
+                    'route' => 'category/<action>'
+                ],
+                //category view
+                [
+                    'pattern' => 'rubrika/<slug>',
+                    'route' => 'category/view'
+                ],
             ],
         ]
 

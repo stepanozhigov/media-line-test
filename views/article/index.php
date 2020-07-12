@@ -7,21 +7,25 @@ use yii\grid\GridView;
 /* @var $searchModel app\models\ArticleSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Articles';
+$this->title = 'Новости';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="article-index">
+<div class="container-fluid container-lg">
+    <div class="article-index pt-4">
+        <div class="d-flex justify-content-between mb-4">
+            <h1><?= Html::encode($this->title) ?></h1>
+            <?php if(!Yii::$app->user->isGuest): ?>
+                <p>
+                    <?= Html::a('Создать Новость', ['news/create'], ['class' => 'btn btn-success']) ?>
+                </p>
+            <?php endif; ?>
+        </div>
 
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php if(!Yii::$app->user->isGuest): ?>
-    <p>
-        <?= Html::a('Create Article', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-    <?php endif; ?>
-    <?= \yii\widgets\ListView::widget([
-        'dataProvider' => $dataProvider,
-        'itemView'=> '_article_item'
-    ]); ?>
-
-
+        <?= \yii\widgets\ListView::widget([
+            'dataProvider' => $dataProvider,
+            'itemView'=> '_article_item',
+            'layout' => "{summary}\n{items}\n{pager}"
+        ]); ?>
+    </div>
 </div>
+
