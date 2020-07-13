@@ -11,7 +11,7 @@ $config = [
     'defaultRoute'=>'category/',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
-        '@npm'   => '@vendor/npm-asset',
+        '@npm'   => '@vendor/npm-asset'
     ],
     'components' => [
         'request' => [
@@ -96,6 +96,11 @@ $config = [
             ],
         ]
 
+    ],
+    'modules'=> [
+        'api'=>[
+            'class'=> \app\modules\api\Module::class
+            ]
     ],
     'params' => $params,
 ];
