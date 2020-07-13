@@ -11,14 +11,21 @@ use \app\models\Category;
 ?>
 
 <div class="article-form">
-
     <?php $form = ActiveForm::begin(); ?>
 
     <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'slug')->textInput(['maxlength' => true]) ?>
 
-    <?=$form->field($model, 'categories[]')->listBox(ArrayHelper::map(Category::getAllCategories(), 'id', 'name'), ['multiple' => true, 'size' => 10,'selected'=>ArrayHelper::map($model->categories,'id','name')]); ?>
+    <?php
+        $cats = $model->categories;
+        $selected = [];
+        foreach ($cats as $cat) {
+            $selected[$cat['id']] = array('selected'=>'selected');
+        }
+    ?>
+
+    <?=$form->field($model, 'categories[]')->listBox(ArrayHelper::map(Category::getAllCategories(), 'id', 'name'), ['multiple' => true, 'size' => 10,'options'=>$selected]); ?>
 
     <?= $form->field($model, 'body')->textarea(['rows' => 10]) ?>
 
