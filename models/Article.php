@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\SluggableBehavior;
@@ -20,6 +21,7 @@ use yii\helpers\Html;
  * @property int|null $updated_at
  *
  * @property User $user
+ * @property $categories
  */
 class Article extends \yii\db\ActiveRecord
 {
@@ -45,6 +47,19 @@ class Article extends \yii\db\ActiveRecord
                 'attribute' => 'title',
                 'slugAttribute' => 'slug',
             ],
+            'saveRelations' => [
+                'class'     => SaveRelationsBehavior::class,
+                'relations' => [
+                    'categories'=>['cascadeDelete'=>true]
+                ],
+            ],
+        ];
+    }
+
+    public function transactions()
+    {
+        return [
+            self::SCENARIO_DEFAULT => self::OP_ALL,
         ];
     }
 
@@ -61,6 +76,7 @@ class Article extends \yii\db\ActiveRecord
             [['title'], 'unique'],
             [['slug'], 'unique'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+            [['categories'], 'required']
         ];
     }
 

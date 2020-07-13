@@ -2,11 +2,12 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use \yii\helpers\ArrayHelper;
+use \app\models\Category;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Article */
 /* @var $form yii\widgets\ActiveForm */
-/* @var $categories \app\models\Category) */
 ?>
 
 <div class="article-form">
@@ -17,7 +18,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'slug')->textInput(['maxlength' => true]) ?>
 
-    <?=$form->field($model, 'id')->listBox(\yii\helpers\ArrayHelper::map(\app\models\Category::getAllCategories(), 'id', 'name'), ['multiple' => true, 'size' => 10])?>
+    <?=$form->field($model, 'categories[]')->listBox(ArrayHelper::map(Category::getAllCategories(), 'id', 'name'), ['multiple' => true, 'size' => 10,'selected'=>ArrayHelper::map($model->categories,'id','name')]); ?>
 
     <?= $form->field($model, 'body')->textarea(['rows' => 10]) ?>
 
