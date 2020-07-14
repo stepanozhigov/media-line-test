@@ -22,16 +22,18 @@ class SignupForm extends Model
         ];
     }
     public function signup() {
-        $user = new User();
-        $user->username = $this->username;
-        $user->password = \Yii::$app->security->generatePasswordHash($this->password);
-        $user->access_token = \Yii::$app->security->generateRandomString();
-        $user->auth_key = \Yii::$app->security->generateRandomString();
-        if($user->save()) {
-            return true;
-        } else {
-            \Yii::error('User was not saved '.VarDumper::dumpAsString($user->errors));
-            return false;
+        if($this->validate()) {
+            $user = new User();
+            $user->username = $this->username;
+            $user->password = \Yii::$app->security->generatePasswordHash($this->password);
+            $user->access_token = \Yii::$app->security->generateRandomString();
+            $user->auth_key = \Yii::$app->security->generateRandomString();
+            if($user->save()) {
+                return true;
+            } else {
+                \Yii::error('User was not saved '.VarDumper::dumpAsString($user->errors));
+                return false;
+            }
         }
     }
 }
