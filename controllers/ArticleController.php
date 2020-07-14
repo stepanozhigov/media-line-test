@@ -85,12 +85,8 @@ class ArticleController extends Controller
     public function actionCreate()
     {
         $model = new Article();
-        if(Yii::$app->request->post()) {
-            $categories = Yii::$app->request->post('categories');
-            $model->categories = $categories;
-            if($model->save()) {
-                return $this->redirect(['view', 'slug' => $model->slug,'created'=>$model]);
-            }
+        if(Yii::$app->request->post() && $model->save()) {
+            return $this->redirect(['view', 'slug' => $model->slug]);
         }
         return $this->render('create', [
             'model' => $model,

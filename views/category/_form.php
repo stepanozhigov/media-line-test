@@ -18,8 +18,6 @@ use yii\widgets\ActiveForm;
 
     <?php
 
-//    $test = $model::getAllCategories();
-//    echo '<pre>',print_r($test,1),'</pre>';
     $exclude = 0;
     if (!empty($model->id)) {
         $exclude = $model->id;

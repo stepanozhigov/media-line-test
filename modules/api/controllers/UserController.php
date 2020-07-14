@@ -38,7 +38,10 @@ class UserController extends Controller
         if($model->load(Yii::$app->request->post(),'') && $model->register()) {
             return true;
         }
-        return false;
+        Yii::$app->response->statusCode = 422;
+        return [
+            'errors'=>$model->errors
+        ];
     }
 
     public function actionLogout()

@@ -25,6 +25,7 @@ class SignupForm extends Model
     public function rules() {
         return [
             [['username','password','password_repeat'],'required'],
+            ['username','unique','targetClass'=>'app\models\User','message'=>'This username is already taken.'],
             [['username','password','password_repeat'],'string','min'=>4, 'max'=>16],
             [['password_repeat'],'string','min'=>4, 'max'=>16],
             ['password_repeat','compare','compareAttribute'=>'password']
