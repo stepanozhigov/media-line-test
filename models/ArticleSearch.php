@@ -41,7 +41,6 @@ class ArticleSearch extends Article
     public function search($params)
     {
         $query = Article::find();
-        $query->joinWith('categories cat',false,'INNER JOIN');
 
         // add conditions that should always apply here
 
@@ -80,6 +79,7 @@ class ArticleSearch extends Article
 
         //add jt relation filters
         if(array_key_exists('filterCategory',$params)) {
+            $query->joinWith('categories cat',false,'INNER JOIN');
             $query->andFilterWhere(['cat.slug'=>$params['filterCategory']]);
         }
 
