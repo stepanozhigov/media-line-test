@@ -2,10 +2,8 @@
 
 namespace app\models;
 
-use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use Yii;
 use yii\behaviors\BlameableBehavior;
-use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\helpers\Html;
 
@@ -21,7 +19,7 @@ use yii\helpers\Html;
  * @property int|null $updated_at
  *
  * @property User $user
- * @property $categories
+ * @property Category[] $categories
  */
 class Article extends \yii\db\ActiveRecord
 {
@@ -42,24 +40,18 @@ class Article extends \yii\db\ActiveRecord
                 'createdByAttribute' => 'user_id',
                 'updatedByAttribute'=> false
             ],
-            [
-                'class' => SluggableBehavior::class,
-                'attribute' => 'title',
+            'slug' => [
+                'class' => 'Zelenin\yii\behaviors\Slug',
                 'slugAttribute' => 'slug',
+                'attribute' => 'title',
+                // optional params
+                'ensureUnique' => true,
+                'replacement' => '-',
+                'lowercase' => true,
+                'immutable' => false,
+                // If intl extension is enabled, see http://userguide.icu-project.org/transforms/general.
+                'transliterateOptions' => 'Russian-Latin/BGN; Any-Latin; Latin-ASCII; NFD; [:Nonspacing Mark:] Remove; NFC;'
             ],
-            'saveRelations' => [
-                'class'     => SaveRelationsBehavior::class,
-                'relations' => [
-                    'categories'=>['cascadeDelete'=>true]
-                ],
-            ],
-        ];
-    }
-
-    public function transactions()
-    {
-        return [
-            self::SCENARIO_DEFAULT => self::OP_ALL,
         ];
     }
 
@@ -70,13 +62,11 @@ class Article extends \yii\db\ActiveRecord
     {
         return [
             [['title'], 'required'],
+            [['title'], 'string', 'max' => 255],
+            [['title'], 'unique'],
             [['body'], 'string'],
             [['user_id', 'created_at', 'updated_at'], 'integer'],
-            [['title', 'slug'], 'string', 'max' => 255],
-            [['title'], 'unique'],
-            [['slug'], 'unique'],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
-            [['categories'], 'required']
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']]
         ];
     }
 
@@ -87,31 +77,32 @@ class Article extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'title' => 'Title',
-            'slug' => 'Slug',
-            'body' => 'Body',
-            'user_id' => 'User ID',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'title' => 'Заголовок',
+            'slug' => 'Идентификатор',
+            'body' => 'Текс Статьи',
+            'user_id' => 'Автор',
+            'created_at' => 'Обновлено',
+            'updated_at' => 'Создано',
         ];
     }
 
     /**
-     * Gets query for [[User]].
-     *
-     * @return \yii\db\ActiveQuery
+    RELATIONS
      */
     public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
-
-    public function getEncodedText($param) {
-        return Html::encode($this->$param);
-    }
-
+//
     public function getCategories() {
         return $this->hasMany(Category::class,['id'=>'category_id'])
             ->viaTable('article_category',['article_id'=>'id']);
+    }
+
+    /**
+    HELPERS
+     */
+    public function getEncodedText($param) {
+        return Html::encode($this->$param);
     }
 }

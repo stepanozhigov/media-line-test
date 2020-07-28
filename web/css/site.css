@@ -27,8 +27,13 @@ body {
     padding-bottom: 4rem;
 }
 .card.card-article {
-    height: 300px;
+    /*height: 300px;*/
 }
+
+.card.card-article .image-holder {
+    min-height: 300px;
+}
+
 .card.card-article > .card-body > .card-body-description
 {
     flex-grow: 2;
@@ -56,6 +61,7 @@ flex-grow: 2;
     height: 4rem;
     background-color: #f5f5f5;
     box-sizing: border-box;
+    z-index: 100;
 }
 
 .jumbotron {
@@ -155,4 +161,31 @@ a.desc:after {
 
 .card .card-text {
     height: 8rem;
+}
+
+/*PAGINATION BS4 FIX*/
+.pagination .page-item:nth-last-child(1).disabled > span
+{
+    position: relative;
+    display: block;
+    padding: 0.5rem 0.75rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    color: #dee2e6;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+}
+.pagination .page-item:nth-child(1).disabled > span {
+    position: relative;
+    display: block;
+    padding: 0.5rem 0.75rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    color: #dee2e6;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-top-left-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
 }

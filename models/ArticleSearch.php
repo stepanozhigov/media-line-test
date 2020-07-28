@@ -2,9 +2,9 @@
 
 namespace app\models;
 
+use app\models\Article;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Article;
 
 /**
  * ArticleSearch represents the model behind the search form of `app\models\Article`.
@@ -40,12 +40,22 @@ class ArticleSearch extends Article
      */
     public function search($params)
     {
-        $query = Article::find()->orderBy('created_at DESC');
+        $query = Article::find();
+        $query->joinWith('categories cat',false,'INNER JOIN');
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination'=>[
+                'pageSize'=>5
+            ],
+            'sort'=>[
+                'defaultOrder'=>[
+                    'created_at'=>SORT_DESC,
+                    'title'=>SORT_ASC
+                ]
+            ],
         ]);
 
         $this->load($params);
@@ -67,6 +77,11 @@ class ArticleSearch extends Article
         $query->andFilterWhere(['like', 'title', $this->title])
             ->andFilterWhere(['like', 'slug', $this->slug])
             ->andFilterWhere(['like', 'body', $this->body]);
+
+        //add jt relation filters
+        if(array_key_exists('filterCategory',$params)) {
+            $query->andFilterWhere(['cat.slug'=>$params['filterCategory']]);
+        }
 
         return $dataProvider;
     }

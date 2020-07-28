@@ -74,8 +74,10 @@ $config = [
                     'pattern' => 'news',
                     'route' => 'article/index'
                 ],
-                //article view
-                'article/<slug>'=>'article/view',
+                [
+                    'pattern' => 'news/rubrika/<filterCategory>',
+                    'route' => 'article/index'
+                ],
 
                 //category index
                 [

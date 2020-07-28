@@ -25,12 +25,12 @@ use \app\models\Category;
         }
     ?>
 
-    <?=$form->field($model, 'categories[]')->listBox(ArrayHelper::map(Category::getAllCategories(), 'id', 'name'), ['multiple' => true, 'size' => 10,'options'=>$selected]); ?>
+    <?= $form->field($model, 'categories[]')->listBox(ArrayHelper::map(Category::getAllCategories(), 'id', 'name'), ['multiple' => true, 'size' => 10,'options'=>$selected]); ?>
 
     <?= $form->field($model, 'body')->textarea(['rows' => 10]) ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

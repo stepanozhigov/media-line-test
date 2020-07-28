@@ -4,7 +4,6 @@ namespace app\models;
 
 use Yii;
 use yii\behaviors\BlameableBehavior;
-use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\helpers\Html;
 
@@ -53,10 +52,6 @@ class Category extends \yii\db\ActiveRecord
                 'transliterateOptions' => 'Russian-Latin/BGN; Any-Latin; Latin-ASCII; NFD; [:Nonspacing Mark:] Remove; NFC;'
             ],
 //            [
-//                'class' => SluggableBehavior::class,
-//                'attribute' => 'title',
-//                'slugAttribute' => 'slug',
-//            ],
             [
                 'class' => BlameableBehavior::class,
                 'createdByAttribute' => 'user_id',
@@ -76,11 +71,11 @@ class Category extends \yii\db\ActiveRecord
             [['title'], 'required'],
             [['user_id', 'parent_id'], 'integer'],
             [['description'], 'string'],
-            [['updated_at', 'created_at'], 'safe'],
+            [['updated_at', 'created_at'], 'integer'],
             [['title', 'slug'], 'string', 'max' => 255],
             [['title'], 'unique'],
             [['slug'], 'unique'],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']]
         ];
     }
 
